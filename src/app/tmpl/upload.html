@@ -1,0 +1,283 @@
+{{ define "title" }}lov3ly.me - Upload{{ end }}
+
+{{define "extrahead"}}
+<style>
+    #galleria{ width: 500px; height: 450px }
+</style>
+<link rel="stylesheet" type="text/css" href="/static/css/imgareaselect-default.css" />
+{{end}}
+
+{{ define "content" }}
+{{$csrf_token := .ctx.Session.Values.csrf_token }}
+{{ $userId := .ctx.User.Id.Hex }}
+{{ $ctx := .ctx }}
+	<div class="pull-left">
+		{{ if not .photos }}
+		<p>{{ trans "No photos yet" .ctx }}.</p>
+		{{ end }}
+		<div id="galleria">
+			{{ range .photos }}
+			<a href="{{ image .Id.Hex "" }}"><img src="{{ image .Id.Hex "thumb" }}"/></a>
+			<div class="layer">
+				<div>
+					<span id="rating">
+					  {{ trans "Rating" $ctx }}: <span href="{{ reverse "get_photo_votes" "id" .Id.Hex }}"></span>
+					</span>
+					<p class="galleria-info-title">
+						{{.Title}}
+					</p>
+					<p class="galleria-info-description">
+						{{.Description}}
+					</p>
+					<p>
+						{{ if .Active }}{{ trans "Active" $ctx }}{{ else }}{{ trans "Inactive" $ctx}}{{ end }}
+					</p>
+					<span class="btn-group">
+					<a id="delete-link" class="btn btn-mini btn-danger" href="{{ reverse "delete" "id" .Id.Hex "csrf_token" $csrf_token }}"><i class="icon-white icon-remove"></i> {{ trans "Delete" $ctx }}</a>
+                    <a class="btn btn-mini" href="{{reverse "external_photo" "id" $userId "kind" "p" "photo" .Id.Hex }}"><i class="icon-share"></i> {{ trans "Link" $ctx }}</a>
+					<a class="btn btn-mini" href="{{ reverse "upload" "id" .Id.Hex}}"><i class="icon-edit"></i> {{ trans "Edit" $ctx }}</a>
+                    <a id="avatar-link" class="btn btn-mini" href="{{ reverse "avatar" "photo" .Id.Hex "csrf_token" $csrf_token }}"><i class="icon-user"></i> {{ trans "Avatar" $ctx }}</a>
+					</span>
+					<a style="display:none;" class="comment-link" href="{{ reverse "comments" "kind" "p" "id" .Id.Hex }}"></a>
+				</div>
+			</div>
+			{{ end }}
+		</div>
+		<div id="comments" class="pull-left comments"></div>
+	</div>
+	<div class="pull-left well" style="max-width: 435px;">
+		<form class="form-horizontal" action="" method="POST" enctype="multipart/form-data">
+			<legend>{{ trans "Upload" .ctx }}</legend>
+			<div class="control-group {{if .ctx.Data.result.Errors.title }}error{{ end }}">
+				<label class="control-label" for="title">{{ trans "Title" .ctx }}</label>
+				<div class="controls">
+					<input type="text" id="title" name="title" placeholder="{{ trans "Title" .ctx }}"
+					value="{{ .ctx.Data.result.Values.title }}">
+					<span class="help-inline">{{ .ctx.Data.result.Errors.title }}</span>
+				</div>
+			</div>
+			<div class="control-group {{if .ctx.Data.result.Errors.description }}error{{ end }}">
+				<label class="control-label" for="description">{{ trans "Description" .ctx }}</label>
+				<div class="controls">
+					<input type="text" id="description" name="description"	placeholder="{{ trans "Description" .ctx }}"
+					value="{{ .ctx.Data.result.Values.description }}">
+					<span class="help-inline">{{ .ctx.Data.result.Errors.description }}</span>
+				</div>
+			</div>
+			<a id="show-extra-data" class="btn btn-link" href="#">{{ trans "Extra info" .ctx }} <b class="caret"></b></a>
+			<div id="extra-data" style="display: none">	
+			<div class="control-group {{if .ctx.Data.result.Errors.country }}error{{ end }}">
+				<label class="control-label" for="country">{{ trans "Country" .ctx }}</label>
+				<div class="controls">
+					<input type="text" id="country" name="country" placeholder="{{ trans "Country" .ctx }}"
+						value="{{ .ctx.Data.result.Values.country }}" autocomplete="off"> <span
+						class="help-inline">{{ .ctx.Data.result.Errors.country }}</span>
+				</div>
+			</div>
+			<div class="control-group {{if .ctx.Data.result.Errors.location }}error{{ end }}">
+				<label class="control-label" for="location">{{ trans "City" .ctx }}</label>
+				<div class="controls">
+					<input type="text" id="location" name="location" placeholder="{{ trans "City" .ctx }}"
+						value="{{ .ctx.Data.result.Values.location }}" autocomplete="off"> <span
+						class="help-inline">{{ .ctx.Data.result.Errors.location }}</span>
+				</div>
+			</div>	
+			<div class="control-group {{if .ctx.Data.result.Errors.age }}error{{ end }}">
+				<label class="control-label" for="age">{{ trans "Age" .ctx }}</label>
+				<div class="controls">
+					<input type="text" id="age" name="age" placeholder="{{ trans "Age" .ctx }}"
+					value="{{ .ctx.Data.result.Values.age }}">
+					<span class="help-inline">{{ .ctx.Data.result.Errors.age }}</span>
+				</div>
+			</div>
+			<div class="control-group {{if .ctx.Data.result.Errors.gender }}error{{ end }}">
+				<label class="control-label" for="gender">{{ trans "Gender" .ctx }}</label>
+				<div class="controls">
+					<select name="gender" id="Gender">
+						<option value="">{{ trans "Select one" .ctx }}</option>
+						<option value="m" {{if eq .ctx.Data.result.Values.gender "m"}}selected="selected"{{end}}>{{ trans "Male" .ctx }}</option>
+						<option value="f" {{if eq .ctx.Data.result.Values.gender "f"}}selected="selected"{{end}}>{{ trans "Female" .ctx }}</option>
+					</select> <span class="help-inline">{{ .ctx.Data.result.Errors.gender }}</span>
+				</div>
+			</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="active">{{ trans "Active" .ctx }}</label>
+				<div class="controls">
+					<input type="checkbox" id="active" name="active"
+					{{ if .ctx.Data.result.Values.active }}checked="yes"{{ end }}>
+				</div>
+			</div>
+			{{ if eq .id "" }}
+			<div class="control-group {{if .ctx.Data.result.Errors.photo }}error{{ end }}">
+				<label class="control-label" for="photo">{{ trans "Photo" .ctx }}</label>
+				<div class="controls">
+					<input type="file" id="photo" name="photo" placeholder="{{ trans "Photo" .ctx }}"
+					value="{{ .ctx.Data.result.Values.photo }}">
+					<span class="help-inline">{{ .ctx.Data.result.Errors.photo }}</span>
+				</div>
+			</div>
+			{{ end }}
+			<input type="hidden" name="x1" id="x1"/>
+			<input type="hidden" name="y1" id="y1"/>
+			<input type="hidden" name="x2" id="x2"/>
+			<input type="hidden" name="y2" id="y2"/>
+			<input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+			<button type="submit" class="btn">
+				{{ trans "Upload" .ctx }}
+			</button>
+		</form>				
+		<table class="table table-condensed">
+			<tbody>
+			<tr>			
+				<td style="min-width: 12em">
+					<h5>{{ trans "What shoud I upload" .ctx }}?</h5>
+					<ul><li>{{ trans "A photo of you" .ctx }}.</li></ul>
+				</td>
+				<td>
+					<h5>{{ trans "What shoud I NOT upload" .ctx }}?</h5>
+					<ul>
+						<li>{{ trans "A photo of somebody else" .ctx }}.</li>
+						<li>{{ trans "A photo of you with somebody else" .ctx }}.</li>
+						<li>{{ trans "A photo of something else. (eg. animals, cars, beautiful mountains)" .ctx }}</li>
+						<li>{{ trans "Indecent stuff" .ctx }}.</li>						
+					</ul>
+				</td>				
+			</tr>
+			<tr>
+				<td colspan="2"><span class="label label-info">Info</span> {{ trans "After selecting a photo you'll get a chance to crop only the relevant image of you ;)" .ctx }}</td> 
+			</tr>
+			</tbody>
+		</table>
+	</div>		
+{{ end }}
+
+{{define "extrascripts"}}
+<script src="/static/js/load-image.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.imgareaselect.pack.js"></script>
+<script type="text/javascript">
+$(function() {
+	$('ul.nav>li.active').removeClass('active');
+	$('ul.nav>li:nth-child(2)').addClass('active');
+    $("#cmo-modal").find(".modal-body").html('\
+<div class="span7" id="processd-photo"></div>\
+<div class="span2"><p>Click and drag to select an area from your image.</p>\
+<button class="btn pull-right" data-dismiss="modal" aria-hidden="true">Crop</button>\
+<br/>\
+<br/>\
+<br/>\
+<br/>\
+<span class="label label-info">Example</span><br/>\
+<img src="/static/img/demo.jpg" alt="crop-demo"/>\
+<br/>\
+</div>\
+');
+    Galleria.run('#galleria', {			
+	    transition : 'none',
+	    //clicknext: true,
+	    //_toggleInfo: false,
+	    showInfo : false,
+	    layerFollow: false,
+	    show: {{ .ctx.Data.index }},
+	    dataConfig : function(img) {
+		    return {
+			    layer : $(img).parent().next('.layer').html()
+		    };
+	    }
+    });
+    $("#galleria").on("click", "#delete-link", function(){
+    var answer = confirm("{{ trans "Are you sure you want to delete the photo" .ctx }}?\n({{ trans "All related votes will be deleted" .ctx }}!)")
+	if (answer){
+	return true;
+	}
+    return false;
+    });
+    $("#galleria").on("click", "#avatar-link", function(){
+	$.get($(this).attr("href"), function(){
+	     $.pnotify({
+		   type : "success",
+				   title : "lov3ly.me",
+				   text : "{{ trans "Avatar set succesfuly" .ctx }}!",
+	     });
+	});
+	return false;
+    });
+    Galleria.on('image', function(e) {
+    	var voteSpan = $("#rating").find("span");
+		$.getJSON(voteSpan.attr("href"), function(data){						
+			voteSpan.html('<span id="personal-rating">' + data.avg + '/5</span> (' + data.count +' votes)');
+		}).error(function() {
+			voteSpan.html('<span id="personal-rating">0</span> votes');
+		});
+		$("#comments").load($(".comment-link").attr("href"));
+	});	
+    
+    var result = document.getElementById('processd-photo');
+	load = function (e) {
+	    e = e.originalEvent;
+	    e.preventDefault();
+	    $("#cmo-modal").modal('show');	    
+	    window.loadImage(
+		e.target.files[0],
+		function (img) {			
+			result.innerHTML = '';
+		    result.appendChild(img);
+		    $('#processd-photo').find("img").imgAreaSelect({
+			handles: true,
+			//aspectRatio: "1:1",
+			onSelectEnd: function(img, selection){
+			   $('#x1').val(selection.x1);
+			   $('#y1').val(selection.y1);
+			   $('#x2').val(selection.x2);
+			   $('#y2').val(selection.y2);
+			}
+		    });
+		},
+		{maxHeight: 440} 
+	    );
+	};
+	$("#comments").on("submit", "form.comment-form", function() {
+		$.post($(this).attr("action"), $(this).serialize(), function(data) {
+			$("#comments").html(data);
+			if ($(".help-inline").text().length == 0) {
+				$.pnotify({
+					type : "success",
+					title : "lov3ly.me",
+					text : "{{ trans "Thank you for your comment" .ctx }}!",
+				});
+			}
+		});
+		return false;
+	});
+    $(document)
+	.on('dragover', function (e) {
+	    e = e.originalEvent;
+	    e.preventDefault();
+	    e.dataTransfer.dropEffect = 'copy';
+	})
+	.on('drop', load);
+    $('#photo').on('change', load);
+    $('#cmo-modal').on('hidden', function () {
+	 $('#processd-photo').find("img").imgAreaSelect({hide:true});
+    });
+    $("#show-extra-data").click(function(){
+    	$("#extra-data").slideToggle();
+    	return false;
+    });
+     $('#location').typeahead({
+                 source: function (query, process) {
+                    return $.get('{{ reverse "location" }}', { query: query }, function (data) {
+                       return process(data.options);
+                    });
+                 }
+    });
+    $('#country').typeahead({
+                 source: function (query, process) {
+                    return $.get('{{ reverse "country" }}', { query: query }, function (data) {
+                       return process(data.options);
+                    });
+                 }
+    });
+});
+</script>
+{{end}}

@@ -1,0 +1,33 @@
+{{ define "title" }}lov3ly.me - {{ trans "Change Password" .ctx }}{{ end }}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+    <form class="form-horizontal" action="" method="POST">
+    <legend>{{ trans "Change Password" .ctx }}</legend>
+    {{ if not .uuid }}
+  	<div class="control-group">
+		<label class="control-label" for="password">{{ trans "Old Password" .ctx }}</label>
+		<div class="controls">
+			<input type="password" id="password" name="password" placeholder="{{ trans "Old Password" .ctx }}">
+		</div>
+	</div>
+    {{ end }}
+    <div class="control-group">
+		<label class="control-label" for="password1">{{ trans "New Password" .ctx }}</label>
+		<div class="controls">
+			<input type="password" id="password1" name="password1" placeholder="{{ trans "New Password" .ctx }}">
+		</div>
+	</div>
+    <div class="control-group">
+		<label class="control-label" for="password2">{{ trans "Verify Password" .ctx }}</label>
+		<div class="controls">
+			<input type="password" id="password2" name="password2" placeholder="{{ trans "Verify Password" .ctx }}">
+		</div>
+	</div>
+	<input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+	<button type="submit" class="btn">{{ trans "Change Password" .ctx }}</button>
+</form>
+{{ end }}
+
+{{define "extrascripts"}}{{end}}

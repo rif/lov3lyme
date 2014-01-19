@@ -1,0 +1,196 @@
+{{define "title"}}lov3ly.me - {{ trans "Contests" .ctx }}{{end}}
+
+{{define "extrahead"}}
+<link href="/static/css/datepicker.css" rel="stylesheet">
+{{end}}
+
+{{ define "content" }}
+<div class="pull-left" style="max-width: 650px; margin-right: 40px;">
+  <h2>{{ trans "My Contests" .ctx }}</h2>
+  {{ $csrf_token := .ctx.Session.Values.csrf_token }}
+  {{ $ctx := .ctx }}
+  <table class="table table-hoover table-compact">
+    <tbody>
+      {{ range .contests}}
+      <tr>
+        <td><a data-toggle="modal" data-target="#cmo-modal" href="{{ reverse "contest_status" "id" .Id.Hex }}">{{ .Name }}</a></td>
+        <td>{{ .Description }}</td>
+        <td>
+          <span class="btn-group">
+            {{ if .Public }}
+            {{ if .RequireApproval }}
+            <a data-toggle="modal" data-target="#cmo-modal" class="btn btn-mini" href="{{ reverse "pending_approvals" "id" .Id.Hex }}"><i class="icon-ok"></i> {{ trans "Approvals" $ctx }}</a>
+            {{ end }}
+            {{else }}
+            <a class="btn btn-mini btn-danger delete-link" href="{{ reverse "delete_contest" "id" .Id.Hex "csrf_token" $csrf_token}}"><i class="icon-white icon-remove"></i> {{ trans "Delete" $ctx }}</a>         
+            <a class="btn btn-mini" href="{{ reverse "contest" "id" .Id.Hex }}"><i class="icon-edit"></i> {{ trans "Edit" $ctx }}</a>
+            <a class="btn btn-mini btn-success publish-link" href="{{ reverse "publish_contest" "id" .Id.Hex "csrf_token" $csrf_token}}"><i class="icon-white icon-volume-up"></i> {{ trans "Publish" $ctx }}</a>
+            {{ end }}
+          </span>
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  {{ if .p.Show }}
+    <div class="pagination">
+      <ul>
+        <li><a href="{{ .p.PageLink .p.First | html }}">{{ trans "First" .ctx }}</a></li>
+        <li><a href="{{ .p.PageLink .p.Prev | html }}">{{ trans "Prev" .ctx }}</a></li>
+          {{ $pg := .p}}
+          {{ range $page := .p.BeforePages }}
+              <li><a href="{{ $pg.PageLink $page | html }}">{{ $page }}</a></li>
+          {{ end }}
+              <li class="active">
+                <a href="#">{{ .p.Current }}</a>
+              </li>
+          {{ range $page := .p.AfterPages }}
+              <li><a href="{{ $pg.PageLink $page | html }}">{{ $page }}</a></li>
+          {{ end }}
+        <li><a href="{{ .p.PageLink .p.Next | html }}">{{ trans "Next" .ctx }}</a></li>
+        <li><a href="{{ .p.PageLink .p.Last | html }}">{{ trans "Last" .ctx }}</a></li>
+      </ul>
+    </div>
+  {{ end }}
+</div>
+<div class="pull-left well" style="max-width: 435px;">
+  <form class="form-horizontal" action="" method="POST">
+	<legend>{{ trans "New Contest" .ctx }}</legend>
+	<div class="control-group {{if .ctx.Data.result.Errors.name }}error{{ end }}">
+		<label class="control-label" for="name">{{ trans "Contest Name" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="name" name="name"
+				placeholder="{{ trans "Name" .ctx }}"
+				value="{{ .ctx.Data.result.Values.name }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.name }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.description }}error{{ end }}">
+		<label class="control-label" for="description">{{ trans "Description" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="description" name="description"
+				placeholder="{{ trans "Description" .ctx }}"
+				value="{{ .ctx.Data.result.Values.description }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.description }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.country }}error{{ end }}">
+		<label class="control-label" for="country">{{ trans "Country" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="country" name="country"
+				placeholder="{{ trans "Country" .ctx }}"
+				value="{{ .ctx.Data.result.Values.country }}" autocomplete="off"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.country }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.location }}error{{ end }}">
+		<label class="control-label" for="location">{{ trans "City" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="location" name="location"
+				placeholder="{{ trans "City" .ctx }}"
+				value="{{ .ctx.Data.result.Values.location }}" autocomplete="off"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.location }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.gdenr }}error{{ end }}">
+		<label class="control-label" for="gender">{{ trans "Gender" .ctx }}</label>
+		<div class="controls">
+			<select name="gender" id="Gender">
+				<option value="">{{ trans "Select one" .ctx }}</option>
+				<option value="m" {{if eq .ctx.Data.result.Values.gender "m"}}selected="selected"{{end}}>{{ trans "Male" .ctx }}</option>
+				<option value="f" {{if eq .ctx.Data.result.Values.gender "f"}}selected="selected"{{end}}>{{ trans "Female" .ctx }}</option>
+			</select> <span class="help-inline">{{ .ctx.Data.result.Errors.gender }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.min_age }}error{{ end }}">
+		<label class="control-label" for="min_age">{{ trans "Minimum Age" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="min_age" name="min_age"
+				placeholder="{{ trans "Minimum Age" .ctx }}"
+				value="{{ .ctx.Data.result.Values.min_age }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.min_age }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.max_age }}error{{ end }}">
+		<label class="control-label" for="max_age">{{ trans "Maximum Age" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="max_age" name="max_age"
+				placeholder="{{ trans "Maximum Age" .ctx }}"
+				value="{{ .ctx.Data.result.Values.max_age }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.max_age }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.admission_deadline }}error{{ end }}">
+		<label class="control-label" for="admission_deadline">{{ trans "Admission Deadline" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="admission_deadline" name="admission_deadline"
+				placeholder="{{ trans "Admission Deadline" .ctx }}"
+				value="{{ .ctx.Data.result.Values.admission_deadline }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.admission_deadline }}</span>
+		</div>
+	</div>
+    <div class="control-group {{if .ctx.Data.result.Errors.voting_deadline }}error{{ end }}">
+		<label class="control-label" for="voting_deadline">{{ trans "Voting Deadline" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="voting_deadline" name="voting_deadline"
+				placeholder="{{ trans "Voting Deadline" .ctx }}"
+				value="{{ .ctx.Data.result.Values.voting_deadline }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.voting_deadline }}</span>
+		</div>
+	</div>
+    <div class="control-group">
+	  <label class="control-label" for="require_approval">{{ trans "Verify before accepting" .ctx }}?</label>
+	  <div class="controls">
+		<input type="checkbox" id="require_approval" name="require_approval"
+			   {{ if .ctx.Data.result.Values.require_approval }}checked="yes"{{ end }}>
+	  </div>
+	</div>
+    <input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+	<button type="submit" class="btn">{{ trans "Submit" .ctx }}</button>
+  </form>
+
+</div>
+</div>
+{{ end }}
+
+{{define "extrascripts"}}
+<script type="text/javascript" src="/static/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript">
+$(function() {
+		$('ul.nav>li.active').removeClass('active');
+		$('ul.nav>li:nth-child(3)').addClass('active');
+        $('#admission_deadline, #voting_deadline').datepicker({
+              format: 'yyyy-mm-dd',
+              viewMode: 2,
+        });
+        $('#location').typeahead({
+                     source: function (query, process) {
+                        return $.get('{{ reverse "location" }}', { query: query }, function (data) {
+                           return process(data.options);
+                        });
+                     }
+        });
+        $('#country').typeahead({
+                     source: function (query, process) {
+                        return $.get('{{ reverse "country" }}', { query: query }, function (data) {
+                           return process(data.options);
+                        });
+                     }
+        });
+        $(".delete-link").click(function(){
+              var answer = confirm("{{ trans "Are you sure you want to delete this contest" .ctx }}?")
+              if (answer){
+                    return true;
+              }
+              return false;
+        });
+        $(".publish-link").click(function(){
+              var answer = confirm("{{ trans "Are you sure you want to make it public" .ctx }}?\n{{ trans "Once the contest is public you cannot make further changes to it" .ctx }}!")
+              if (answer){
+                    return true;
+              }
+              return false;
+        });
+	});  
+</script>
+{{end}}

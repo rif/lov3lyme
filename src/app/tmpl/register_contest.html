@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="span4">
+       	<b class="large">{{ .contest.Name }}</b>
+   		<p class="muted">{{ if .contest.Description }}{{ .contest.Description }}{{ end }}</p>
+
+     <table class="contest-info table table-condensed table-hover">
+     <tbody>
+      <tr><td>{{ trans "Country" .ctx }}</td><td>{{ if .contest.Country }}{{ .contest.Country }}{{ else }}{{ trans "All" .ctx }}{{ end }}</td></tr>
+      <tr><td>{{ trans "City" .ctx }}</td><td>{{ if .contest.Location }}{{ .contest.Location }}{{ else }}{{ trans "All" .ctx }}{{ end }}</td></tr>
+      <tr><td>{{ trans "Minimum Age" .ctx }}: {{ .contest.MinAge }}</td><td>{{ trans "Maximum Age" .ctx }}: {{ .contest.MaxAge }}</td></tr>
+      <tr><td>{{ trans "Gender" .ctx }}</td><td>{{ if eq .contest.Gender "f" }}{{ trans "Female" .ctx }}{{ else }}{{ trans "Male" .ctx }}{{ end }}</td></tr>
+      <tr><td>{{ trans "Admission Deadline" .ctx }}</td><td>{{ .contest.AD }}</td></tr>
+      <tr><td>{{ trans "Voting Deadline" .ctx }}</td><td>{{ .contest.VD }}</td></tr>
+      <tr><td>{{ trans "Admission Verification" .ctx }}</td><td>{{ if .contest.RequireApproval }}{{ trans "Yes" .ctx }}{{ else }}{{ trans "No" .ctx }}{{ end }}</td></tr>
+      </tbody>
+      </table>
+  </div>
+  <div class="span6">
+    <form class="form-horizontal" action="{{ reverse "register_contest" "id" .contest.Id.Hex }}" method="POST">
+	<legend>Your photos</legend>
+	<ul class="thumbnails">
+	  {{ range .photos }}
+	  <li class="span1">
+	    <div class="thumbnail">
+	      
+	      <label class="radio">
+		<input type="radio" name="photo" value="{{ .Id.Hex }}" checked>
+		  <img src="{{ image .Id.Hex "thumb" }}" alt="{{ .Title }}" />
+	      </label>
+	    </div>
+	  </li>
+	  {{ end }}
+	</ul>
+      <input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+	  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+    </form>  
+  </div>
+</div>
+
+<script type="text/javascript">
+$(function() {});  
+</script>
+

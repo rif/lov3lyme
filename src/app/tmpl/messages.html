@@ -1,0 +1,68 @@
+{{ define "title" }}lov3ly.me - Messages{{ end }}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+<h2>{{ trans "Private Messages" .ctx }}</h2>
+<div class="row">
+	<div class="offset2 span6">
+		<div class="accordion" id="accordion2">
+		{{ range $index, $m := .messages }}
+		  <div class="accordion-group">
+		    <div class="accordion-heading">
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#col-{{ $index }}">{{ $m.Subject }} <div style="width: 150px" class="pull-right">{{ $m.UserName }} <img style="margin-left: 20px" class="apple-thumb" src="{{ $m.Avatar }}" alt="avatar"/></div></a>
+		    </div>
+		    <div id="col-{{ $index }}" class="accordion-body collapse">
+		      <div class="accordion-inner">
+		        {{.Body}}
+		        <div class="pull-right">
+		        	<a data-toggle="modal" data-target="#cmo-modal" title="Sender profile" href="{{reverse "photos" "id" $m.From.Hex "photo" "" }}"><i class="icon-user"></i></a>
+		        	<a class="replay-link" title="Replay" href="{{ reverse "send_message" "to" $m.From.Hex }}"><i class="icon-edit"></i></a>
+					<a class="delete-link" title="Delete" href="{{ reverse "delete_message" "id" $m.Id.Hex }}"><i class="icon-remove"></i></a>
+		        </div>
+		      </div>
+		    </div>
+		  </div>	
+	   {{ else }}
+		  <p>{{ trans "No messages yet" .ctx }}.</p>	  
+	   {{ end}}  
+	  </div>				
+	</div>
+</div>
+
+
+<div id="private-message"></div>
+
+{{ end }}
+
+{{define "extrascripts"}}
+<script type="text/javascript">
+	$(function(){
+		$('ul.nav>li.active').removeClass('active');
+		$('ul.nav>li:nth-child(4)').addClass('active');
+		$('.message-link').click(function(){
+			$('#message-body').load($(this).attr('href'));
+			return false;
+		});
+		$('.replay-link').click(function(){
+  			$('#private-message').load($(this).attr('href'), function(){
+  				$('#messageModal').modal();
+  			});
+  			return false;
+  		});
+  		$('.delete-link').click(function(){
+  			var link = $(this);
+  			$.get(link.attr('href'));
+  			link.parents(".accordion-group").fadeOut();
+  			return false;
+  		});
+  		$('img.apple-thumb').hover(
+		    function(){           
+		       $(this).css('z-index','10').stop().animate({marginTop: '-60px', height: '80px', }, 100); 
+			},
+		   	function() {
+		       $(this).stop().animate({marginTop: '0px', height: '20px', }, 200).css('z-index','0');
+		});
+	});
+</script>	
+{{end}}

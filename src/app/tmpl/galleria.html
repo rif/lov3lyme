@@ -1,0 +1,164 @@
+<style>
+    #galleria-{{.hash}}{ width: 500px; height: 450px }
+</style>
+
+<div id="container">		
+	{{ if .user }}
+	<div id="header-info">
+		<b class="large">{{ .user.FullName }}</b>
+		<p class="muted">
+			{{ .user.Info }}
+		</p>		
+	</div>
+	{{ end }}
+	{{ $ctx := .ctx }}	
+	{{ $hash := .hash}}
+	<div class="galco">	  	
+	<div id="galle" class="pull-left">
+			<p class="no-photos" style="display:none">{{ trans "No photos yet" .ctx }}.</p>			
+			<div id="galleria-{{.hash}}">
+				{{ range .photos }}
+				<a href="{{ image .Id.Hex "" }}"><img id="{{ .Id.Hex }}" src="{{ image .Id.Hex "thumb" }}"/></a>
+				<div class="layer">
+					<div>
+						<p class="galleria-info-title">{{.Title}}</p>
+						<p class="galleria-info-description">{{.Description}}</p>						
+						{{ if $ctx.User }}
+						{{ if neq $ctx.User.Id .User }}
+							<span id="vote-{{$hash}}" href="{{ reverse "get_vote" "photo" .Id.Hex "contest" "" }}"></span>
+						{{ end }}
+						{{ else }}
+						<p>{{ trans "Login to rate this photo" $ctx }}.</p>
+						{{ end }}						
+						<span class="btn-group"> <a tip="{{ trans "Link" $ctx }}" class="btn btn-mini btn-link" href="{{reverse "external_photo" "id" .User.Hex "kind" "p" "photo" .Id.Hex }}" target="_blank"><i class="icon-white icon-share"></i></a>
+						{{ if $ctx.User }}
+							{{ if neq $ctx.User.Id .User }}							
+							<a id="fake-link" tip="{{ trans "Fake" $ctx }}" class="btn btn-link btn-mini" href="{{ reverse "fake" "photo" .Id.Hex "csrf_token" $ctx.Session.Values.csrf_token }}"><i class="icon-white icon-thumbs-down"></i></a>
+							<a id="abuse-link" tip="{{ trans "Abuse" $ctx }}"class="btn btn-link btn-mini" href="{{ reverse "abuse" "photo" .Id.Hex  "csrf_token" $ctx.Session.Values.csrf_token }}"><i class="icon-white icon-fire"></i></a>
+							<a id="mes-link" tip="{{ trans "Message" $ctx }}" href="{{ reverse "send_message" "to" .User.Hex}}" class="btn btn-link btn-mini"><i class="icon-white icon-comment"></i></a>							
+							{{ end }}						
+						{{ end }}											
+						</span>
+						<span class="muted" id="tip"></span>
+						<a style="display:none;" class="comment-link" href="{{ reverse "comments" "kind" "p" "id" .Id.Hex }}"></a>
+					</div>
+				</div><!-- layer -->
+				{{ else }}
+				<p>{{ trans "No photos yet" .ctx }}.</p>
+				{{ end }}
+			</div>									
+		</div><!-- galle -->					
+		<div class="fb-like" data-send="false" data-layout="button_count" data-width="150" data-show-faces="true"></div>
+		<div id="plusone-div"></div>		
+		<div id="comments-{{.hash}}" class="pull-left comments"></div>
+	</div> <!-- galco -->
+	{{ if .contest }}
+	<div class="row">
+	<div class="span3">
+	      <div><b class="large">{{ .contest.Name }}</b></div>
+	      <div class="muted">
+	      {{ if .contest.Description }}<div>{{ .contest.Description }}</div>{{ end }}
+	      </div>
+	</div>
+	<div class="span2">
+		<table class="small table table-condensed">
+	    <tr><td>Country</td><td>{{ if .contest.Country }}{{ .contest.Country }}{{ else }}All{{ end }}</td></tr>
+	    <tr><td>City</td><td>{{ if .contest.Location }}{{ .contest.Location }}{{ else }}All{{ end }}</td></tr>
+	    </table>
+	</div>
+	<div class="span2">
+		<table class="table table-condensed">
+	    <tr><td>Min age</td><td>{{ .contest.MinAge }}</td></tr>
+	    <tr><td>Max age</td><td>{{ .contest.MaxAge }}</td></tr>
+	    <tr><td>Gender</td><td>{{ if eq .contest.Gender "f" }}Female{{ else }}Male{{ end }}</td></tr>
+	    </table>
+	</div>
+	<div class="span3">
+		<table class="table table-condensed">
+	    <tr><td>Admission deadline</td><td>{{ .contest.AD }}</td></tr>
+	    <tr><td>Voting deadline</td><td>{{ .contest.VD }}</td></tr>
+	    <tr><td>Admission verification</td><td>{{ if .contest.RequireApproval }}Yes{{ else }}No{{ end }}</td></tr>
+	    </table>
+	</div>
+    </div><!-- row -->	
+	{{ end }}
+</div><!-- container -->
+<div id="private-message"></div>
+<script type="text/javascript">
+	$(function() {
+	/*Galleria.ready(function(options) {});*/
+	Galleria.on('image', function(e) {		
+		$("#comments-{{.hash}}").load($(".comment-link").attr("href"));		
+		var voteDiv = $("#vote-{{.hash}}");
+		if (voteDiv.length > 0){
+			voteDiv.load(voteDiv.attr("href"));
+		}
+		/* Get some the next page */
+		var g = Galleria.get(0);
+		var totalPhotos = g.getDataLength();
+		var currentPhotoIndex = g.getIndex();		
+		if ((totalPhotos - currentPhotoIndex) < 5) {
+			page += 1;			
+			var url = photoUrl.substring(0, photoUrl.lastIndexOf("/")+1)+page;
+			$.get(url, function(data){
+				Galleria.get(0).push(data);				
+			});
+		}
+		$('.fb-like').attr('data-href', 'http://cmo-rif.rhcloud.com' + $('#ext-link').attr('href'));
+		try{FB.XFBML.parse();}catch(ex){}		
+		gapi.plusone.render("plusone-div", {"size": "small","href": 'http://cmo-rif.rhcloud.com' +  $('#ext-link').attr('href')});
+	});	
+	Galleria.run('#galleria-{{.hash}}',{
+		transition: 'slide',		
+		showInfo: false,
+		layerFollow: false,
+		show: {{ .ctx.Data.index }},
+		dataConfig: function(img) {
+			return {
+				layer : $(img).parent().next('.layer').html()
+			};
+		}
+	});	
+	$("#galleria-{{.hash}}").on("click", "#heart-rating > s", function(e) {
+		$("#heart-rating s").removeClass("voted");
+		var parents = $(e.target).parents("s");
+		var numHearts = parents.length + 1;
+		var parent = $(this).parent();
+		parents.addClass("voted");
+		$(e.target).addClass("voted");
+		$.get(parent.attr("href") + "?v=" + numHearts)
+	});
+	$("#comments-{{.hash}}").on("submit", "form.comment-form", function() {
+		$.post($(this).attr("action"), $(this).serialize(), function(data) {
+			$("#comments-{{.hash}}").html(data);
+			if ($(".help-inline").text().length == 0) {
+				$.pnotify({
+					type : "success",
+					title : "lov3ly.me",
+					text : "Thank you for your comment!",
+				});
+			}
+		});
+		return false;
+	});
+	$("#galleria-{{.hash}}").on("click", "#fake-link, #abuse-link", function() {
+		var val = $(this).children(".value");
+		$.get($(this).attr("href"));
+		$.pnotify({
+			type : "success",
+			title : "lov3ly.me",
+			text : "Thank you for your report!",
+		});
+		return false;
+	}).on('mouseenter', '.btn-link', function(){
+		$('#tip').text($(this).attr('tip'));
+	}).on('mouseleave', '.btn-link', function(){
+		$('#tip').text("");
+	}).on('click', '#mes-link', function(){
+		$("#private-message").load($(this).attr("href"), function(){
+			$('#messageModal').modal();
+		});
+		return false;
+	});		
+	});
+</script>

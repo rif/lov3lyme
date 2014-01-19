@@ -1,0 +1,155 @@
+{{ define "title" }}lov3ly.me - {{ trans "Admin" .ctx }}{{ end }}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#usr" data-toggle="tab">Users</a></li>
+    <li><a href="#pho" data-toggle="tab">{{ trans "Photos" .ctx }}</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="usr">
+      <table class="table table-hover">
+			<thead>
+				<tr>					
+					<th>{{ trans "Email" .ctx }}</th>
+					<th>{{ trans "Name" .ctx }}</th>
+					<th>{{ trans "Location" .ctx }}</th>					
+					<th>{{ trans "BirthDate" .ctx }}</th>
+					<th>{{ trans "Gender" .ctx }}</th>
+					<th>{{ trans "Avatar" .ctx }}</th>
+					<th>{{ trans "Fb, Gl" .ctx }}</th>
+					<th>{{ trans "Admin" .ctx }}</th>						      
+					<th>{{ trans "Actions" .ctx }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{ range .users }}
+					<tr>						
+						<td><a data-toggle="modal" data-target="#cmo-modal" href="{{ reverse "photos" "id" .Id.Hex "photo" "" }}">{{ .Email }}</a></td>
+						<td>{{ .FullName }}</td>						
+						<td>{{ .Country }}, {{ .Location }}</td>
+						<td>{{ .BirthDate.Format "2006-01-02" }}, {{ .Age }}</td>
+						<td>{{ .Gender }}</td>
+						<td><img class="apple-thumb" src="{{ .Avatar }}" alt="avatar" /></td>
+						<td>
+							<input type="checkbox" name="fb" disabled="disabled" {{ if .FbId }}checked="yes"{{ end }}>
+							<input type="checkbox" name="gl" disabled="disabled" {{ if .GlId }}checked="yes"{{ end }}>
+						</td>
+						<td><input type="checkbox" name="admin" disabled="disabled" {{ if .Admin }}checked="yes"{{ end }}></td>		
+						<td>
+							<div class="btn-group">
+						  		<a href="{{ reverse "send_message" "to" .Id.Hex}}" class="message-link btn btn-mini"><i class="icon-comment"></i> Mess</a>
+						  		<a href="{{ reverse "del_user" "id" .Id.Hex }}" class="btn btn-danger btn-mini"><i class="icon-remove icon-white"></i> Del</a>
+						  	</div>
+						</td>									
+					</tr>
+				{{ end }}
+			</tbody>
+		</table>
+		{{ if .up.Show }}
+	    <div class="pagination">
+	      <ul>
+	        <li><a href="{{ .up.PageLink .up.First | html }}">First</a></li>
+	        <li><a href="{{ .up.PageLink .up.Prev | html }}">Prev</a></li>
+	          {{ $pg := .up}}
+	          {{ range $page := .up.BeforePages }}
+	              <li><a href="{{ $pg.PageLink $page | html }}">{{ $page }}</a></li>
+	          {{ end }}
+	              <li class="active">
+	                <a href="#">{{ .up.Current }}</a>
+	              </li>
+	          {{ range $page := .up.AfterPages }}
+	              <li><a href="{{ $pg.PageLink $page | html }}">{{ $page }}</a></li>
+	          {{ end }}
+	        <li><a href="{{ .up.PageLink .up.Next | html }}">Next</a></li>
+	        <li><a href="{{ .up.PageLink .up.Last | html }}">Last</a></li>
+	      </ul>
+	    </div>
+	  {{ end }}
+    </div>
+    <div class="tab-pane" id="pho">
+      <table class="table table-hover">
+			<thead>
+				<tr>
+					<th>{{ trans "Id" .ctx }}</th>
+					<th>{{ trans "Title" .ctx }}</th>
+					<th>{{ trans "Description" .ctx }}</th>
+					<th>{{ trans "Act Del" .ctx }}</th>			
+					<th>{{ trans "Cou, City, Gen, Age" .ctx }}</th>
+					<th>{{ trans "FakeCount" .ctx }}</th>
+					<th>{{ trans "AbuseCount" .ctx }}</th>
+					<th>{{ trans "Actions" .ctx }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{ range .photos }}
+				<tr>
+					<td><a data-toggle="modal" data-target="#cmo-modal" href="{{reverse "photos" "id" .User.Hex "photo" .Id.Hex }}"><img class="apple-thumb" src="{{ image .Id.Hex "thumb" }}" alt="photo" /></a></td>
+					<td>{{ .Title }}</td>
+					<td>{{ .Description }}</td>
+					<td>
+						<input type="checkbox" name="active" disabled="disabled" {{ if .Active }}checked="yes"{{ end }}>
+						<input type="checkbox" name="deleted" disabled="disabled" {{ if .Deleted }}checked="yes"{{ end }}>
+					</td>			
+					<td>{{ .Country }},{{ .Location }},{{ .Gender }},{{ .Age }}</td>
+					<td>{{ .FakeCount }}</td>
+					<td>{{ .AbuseCount }}</td>
+					<td>
+						<div class="btn-group">
+						  <a href="{{ reverse "send_message" "to" .User.Hex}}" class="message-link btn btn-mini"><i class="icon-comment"></i> Mess</a>
+						  <a href="#" class="btn btn-danger btn-mini"><i class="icon-remove icon-white"></i> Del</a>				  				 
+						</div>								
+					</td>
+				</tr>
+				{{ end }}
+			</tbody>
+		</table>
+		{{ if .pp.Show }}
+	    <div class="pagination">
+	      <ul>
+	        <li><a href="{{ .pp.PageLink .pp.First | html }}">First</a></li>
+	        <li><a href="{{ .pp.PageLink .pp.Prev | html }}">Prev</a></li>
+	          {{ $pg := .pp}}
+	          {{ range $page := .pp.BeforePages }}
+	              <li><a href="{{ $pg.PageLink $page | html }}">{{ $page }}</a></li>
+	          {{ end }}
+	              <li class="active">
+	                <a href="#">{{ .pp.Current }}</a>
+	              </li>
+	          {{ range $page := .pp.AfterPages }}
+	              <li><a href="{{ $pg.PageLink $page | html }}">{{ $page }}</a></li>
+	          {{ end }}
+	        <li><a href="{{ .pp.PageLink .pp.Next | html }}">Next</a></li>
+	        <li><a href="{{ .pp.PageLink .pp.Last | html }}">Last</a></li>
+	      </ul>
+	    </div>
+	  {{ end }}
+    </div>
+  </div>
+</div>
+
+<div id="private-message"></div>
+
+{{ end }}
+
+{{define "extrascripts"}}
+<script type="text/javascript" charset="utf-8">
+	$(function(){
+		$('img.apple-thumb').hover(
+		    function(){           
+		       $(this).css('z-index','10').stop().animate({marginTop: '-60px', height: '80px', }, 100); 
+			},
+		   	function() {
+		       $(this).stop().animate({marginTop: '0px', height: '20px', }, 200).css('z-index','0');
+		});      
+   		$('.message-link').click(function(){  			
+  			$("#private-message").load($(this).attr("href"), function(){
+  				$('#messageModal').modal();
+  			});
+  			return false;
+  		});
+      });
+</script>
+{{end}}

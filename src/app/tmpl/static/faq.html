@@ -1,0 +1,86 @@
+
+{{define "title"}}lov3ly.me - FAQ{{end}}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+<h2>FAQ</h2>
+
+<div class="accordion" id="accordion2">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#q1">
+        What can I upload on lov3ly.me?
+      </a>
+    </div>
+    <div id="q1" class="accordion-body collapse">
+      <div class="accordion-inner">
+        You can upload only jpeg encoded photos representing your person. The photos may not contain images of other persons or animals, nudity, or other offending, discriminatory or disturbing images.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#q2">
+        Can I upload photos of myself at a younger age?
+      </a>
+    </div>
+    <div id="q2" class="accordion-body collapse">
+      <div class="accordion-inner">
+        Yes, when you do so make sure specify in your photo uploading form the age you had in that picture. Doing so prevents receiving fake reports on your photo.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#q3">
+        What is the fake button used for?
+      </a>
+    </div>
+    <div id="q3" class="accordion-body collapse">
+      <div class="accordion-inner">
+        You should use the fake button when you are sure that the photo does not represent the photo owner. Examples: the owner is male and the picture represents a female, you recognize the person in the photo or the owner and they do not match, the age of the owner cannot be the age of the person in the picture.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#q4">
+        What is the abuse button used for?
+      </a>
+    </div>
+    <div id="q4" class="accordion-body collapse">
+      <div class="accordion-inner">
+        You should use the abuse button when you see that the photo represents images of multiple persons, animals, nudity, or other offending, discriminatory or disturbing images.
+      </div>
+    </div>
+  </div>  
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#q5">
+        When I delete a photo, is it really deleted?
+      </a>
+    </div>
+    <div id="q5" class="accordion-body collapse">
+      <div class="accordion-inner">
+        Yes, when you delete a photo we delete the photo, the votes and the comments related to it. Exception are the photos that you enrolled in contests which are preserved in those contexts only.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#q6">
+        How is the ranking score computed?
+      </a>
+    </div>
+    <div id="q6" class="accordion-body collapse">
+      <div class="accordion-inner">
+        The ranking score is computed using the lower bound of Wilson score confidence interval. For more information you can read <a href="http://www.evanmiller.org/how-not-to-sort-by-average-rating.html" target="_blank">this article</a>.
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ end }}
+
+{{define "extrascripts"}}{{end}}

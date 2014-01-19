@@ -1,0 +1,51 @@
+<div id="comment-list">
+	{{ range .object.CommentList }}
+	<div class="media">
+	  <a class="pull-left" href="{{ reverse "external_photo" "id" .User.Hex "kind" "p" "photo" ""}}" target="_blank">
+	    <img class="media-object" src="{{ .Avatar }}" lt="{{ .UserName }}"/>
+	  </a>
+	  <div class="media-body">
+	    <div class="media-heading"><a href="{{ reverse "external_photo" "id" .User.Hex "kind" "p" "photo" ""}}" target="_blank">{{ .UserName }}</a></div>
+	    <div class="media-time muted small">{{human_time .Id.Time}}</div>
+{{.Body}}</div>
+	</div>
+	{{ else }}
+	<div>
+		{{ trans "No comments yet" .ctx }}.
+	</div>
+	{{ end }}	
+	<hr/>
+</div>
+{{ if .ctx.User }}
+<form class="form comment-form" action="{{ reverse "comments" "kind" .kind "id" .object.Id.Hex }}" method="POST">
+	<div class="control-group {{if .ctx.Data.result.Errors.body }}error{{ end }}">
+		<div class="controls">
+			<div class="input-append">
+				<textarea nae="body" rows="1" name="body" id="comment-box" placeholder="{{ trans "Your comment" .ctx }}"></textarea>
+	  			<button class="btn btn-mini" type="submit">{{ trans "Send" .ctx }}</button>
+			</div>	
+			<span class="help-inline">{{ .ctx.Data.result.Errors.body }}</span>
+		</div>
+	</div>
+	<input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+</form>
+{{ else }}
+<p>{{ trans "Please login to post comments" .ctx }}.</p>
+{{ end }}
+
+<script>
+    $('#comment-box').keypress(function(e){
+        var code = (e.keyCode ? e.keyCode : e.which);        
+        if(code == 13) { //Enter keycode
+            if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey) { // ctrl or alt/option key is down
+                // don't submit    
+            } else {
+                $('form.comment-form').submit();
+            }
+        }
+    });
+    $('#comment-box').focus(function(){
+        var box = $(this);
+        box.attr("rows", "3");
+    });
+</script>

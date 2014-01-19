@@ -1,0 +1,37 @@
+{{ define "title" }}lov3ly.me - {{ trans "Login" .ctx }}{{ end }}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+<div class="row">
+	<div class="span5">
+	    <form class="form-horizontal" action="" method="POST">
+	    <legend>{{ trans "Login" .ctx }}</legend>
+	  	<div class="control-group">
+	    	<label class="control-label" for="email">{{ trans "E-mail" .ctx }}</label>
+	    	<div class="controls">
+	      		<input type="text" id="email" name="email" placeholder="{{ trans "E-mail" .ctx }}">
+	    	</div>
+	  	</div>
+	  	<div class="control-group">
+	    	<label class="control-label" for="password">{{ trans "Password" .ctx }}</label>
+	    	<div class="controls">
+	      		<input type="password" id="password" name="password" placeholder="{{ trans "Password" .ctx }}">
+	    	</div>    	
+	  	</div>  	
+	  	<input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+		<button type="submit" class="btn btn-primary">{{ trans "Login" .ctx }}</button>  	
+		</form>
+		<p><a href="{{ reverse "reset" }}">{{ trans "Lost Password" .ctx }}?</a></p>
+	</div>
+	<div class="span5">		
+		<div style="margin:100px 70px;">
+			<p><a href="{{.fbLoginLink}}"><img src="/static/img/login-facebook.png" alt="Login with Facebook" /></a></p>
+			<p><a href="{{.glLoginLink}}"><img src="/static/img/login-google.png" alt="Login with Google" /></a></p>
+		</div>	  
+	</div>
+</div>
+<p>{{ trans "By clicking Login or social Sign in buttons, you confirm that you have read and you agree to our" .ctx }} <a href="{{ reverse "page" "p" "terms" }}">{{ trans "Terms" .ctx }}</a>.</p>
+{{ end }}
+
+{{define "extrascripts"}}{{end}}

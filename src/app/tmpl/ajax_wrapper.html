@@ -1,0 +1,17 @@
+{{ define "title" }}lov3ly.me{{ end }}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+    <div class="content"></div>
+{{ end }}
+
+{{define "extrascripts"}}
+<script>
+    $(function(){
+    	page = 1;
+		photoUrl = "{{reverse "top" "page" 1 }}";
+        $(".content").load("{{ .ajaxurl }}");
+    });
+</script>
+{{end}}

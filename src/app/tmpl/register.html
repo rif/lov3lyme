@@ -1,0 +1,230 @@
+{{ define "title" }}{{ trans .ctx.Data.title .ctx }}{{ end }}
+
+{{define "extrahead"}}
+<link href="/static/css/datepicker.css" rel="stylesheet">
+{{end}}
+
+{{ define "content"}}
+<div class="row">
+	<div class="span6">
+<form class="form-horizontal" action="." method="POST">
+	<legend>{{ trans .ctx.Data.title .ctx }}</legend>
+	<div id="gravatar">
+	  {{ if eq .ctx.Data.title "Profile" }}
+	  <a href="{{ reverse "upload" "id" ""}}" target="_blank"><img src="{{ .ctx.User.Avatar }}" alt="{{ .ctx.User.FullName }}"/></a><br/>
+	  <a href="{{ reverse "upload" "id" ""}}">{{ trans "Change on My Photos section" .ctx }}</a>
+	  {{ end }}
+	</div>
+	<br/>	
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.firstname }}error{{ end }}">
+		<label class="control-label" for="firstname">{{ trans "First Name" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="firstname" name="firstname"
+				placeholder="{{ trans "First Name" .ctx }}"
+				value="{{ .ctx.Data.result.Values.firstname }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.firstname }}</span>
+		</div>
+	</div>
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.lastname }}error{{ end }}">
+		<label class="control-label" for="lastname">{{ trans "Last Name" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="lastname" name="lastname"
+				placeholder="{{ trans "Last Name" .ctx }}"
+				value="{{ .ctx.Data.result.Values.lastname }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.lastname }}</span>
+		</div>
+	</div>
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.email }}error{{ end }}">
+		<label class="control-label" for="email">{{ trans "E-mail" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="email" name="email" placeholder="{{ trans "E-mail" .ctx }}"
+				value="{{ .ctx.Data.result.Values.email }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.email }}</span>
+		</div>
+	</div>
+	{{ if eq .ctx.Data.title "Register" }}
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.password1 }}error{{ end }}">
+		<label class="control-label" for="password1">{{ trans "Password" .ctx }}</label>
+		<div class="controls">
+			<input type="password" id="password1" name="password1"
+				placeholder="{{ trans "Password" .ctx }}"> <span class="help-inline">{{ .ctx.Data.result.Errors.password1 }}</span>
+		</div>
+	</div>
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.password2 }}error{{ end }}">
+		<label class="control-label" for="password2">{{ trans "Verify Password" .ctx }}</label>
+		<div class="controls">
+			<input type="password" id="password2" name="password2"
+				placeholder="{{ trans "Verify Password" .ctx }}"> <span class="help-inline">{{	.ctx.Data.result.Errors.password2 }}</span>
+		</div>
+	</div>
+	{{ end }}
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.country }}error{{ end }}">
+		<label class="control-label" for="country">{{ trans "Country" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="country" name="country" placeholder="{{ trans "Country" .ctx }}"
+				value="{{ .ctx.Data.result.Values.country }}" autocomplete="off"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.country }}</span>
+		</div>
+	</div>
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.location }}error{{ end }}">
+		<label class="control-label" for="location">{{ trans "City" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="location" name="location"
+				placeholder="{{ trans "City" .ctx }}"
+				value="{{ .ctx.Data.result.Values.location }}" autocomplete="off"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.location }}</span>
+		</div>
+	</div>
+	<div
+		class="control-group {{if .ctx.Data.result.Errors.birthdate }}error{{ end }}">
+		<label class="control-label" for="birthdate">{{ trans "Birthday" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="birthdate" name="birthdate"
+				placeholder="{{ trans "YYYY-MM-DD" .ctx }}"
+				value="{{ .ctx.Data.result.Values.birthdate }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.birthdate }}</span>
+		</div>
+	</div>
+	<div class="control-group {{if .ctx.Data.result.Errors.gender }}error{{ end }}">
+		<label class="control-label" for="gender">{{ trans "Gender" .ctx }}</label>
+		<div class="controls">
+			<select name="gender" id="Gender">
+				<option value="">{{ trans "Select one" .ctx }}</option>
+				<option value="m" {{if eq .ctx.Data.result.Values.gender "m"}}selected="selected"{{end}}>{{ trans "Male" .ctx }}</option>
+				<option value="f" {{if eq .ctx.Data.result.Values.gender "f"}}selected="selected"{{end}}>{{ trans "Female" .ctx }}</option>
+			</select> <span class="help-inline">{{ .ctx.Data.result.Errors.gender }}</span>
+		</div>
+	</div>
+    {{ if eq .ctx.Data.title "Register" }}
+	<input type=hidden name="captchaId" value="{{.ctx.Data.cap}}"><br>
+	
+    <div class="control-group">
+	  <div class="controls">
+        <p><img id=image src="/captcha/{{.ctx.Data.cap}}.png" alt="Captcha image"></p>
+        <p><a href="#" onclick="reload()">{{ trans "Reload" .ctx }}</a></p>
+		<input type="text" name="captchaSolution" placeholder="{{ trans "Type the above numbers" .ctx }}">
+	  </div>
+    </div>
+    {{ end }}
+    <input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+	<button type="submit" class="btn btn-primary">{{ if eq .ctx.Data.title "Register" }}{{ trans "Sign Up" .ctx }}{{ else }}{{ trans "Update Profile" .ctx }}{{ end }}</button>
+</form>
+</div> <!-- span5-->
+	{{ if eq .ctx.Data.title "Register" }}
+	<div class="span5">		
+	  <div style="margin:300px 70px;">
+			<p><a href="{{.fbLoginLink}}"><img src="/static/img/login-facebook.png" alt="Login with Facebook" /></a></p>
+			<p><a href="{{.glLoginLink}}"><img src="/static/img/login-google.png" alt="Login with Google" /></a></p>
+		</div>
+	</div>
+	{{ end }}
+</div>
+{{ if eq .ctx.Data.title "Register" }}
+<p>{{ trans "By clicking Sign Up or social Sign in buttons, you confirm that you have read and you agree to our" .ctx }} <a href="{{ reverse "page" "p" "terms" }}">{{ trans "Terms" .ctx }}</a>.</p>
+{{ end }}
+{{ end }}
+
+{{define "extrascripts"}}
+<script type="text/javascript" src="/static/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript">
+	function web2py_calc_entropy(mystring) {
+		//calculate a simple entropy for a given string
+		var csets = new Array('abcdefghijklmnopqrstuvwxyz',
+				'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '0123456789', '!@#$\%^&*()',
+				'~`-_=+[]{}\|;:\'",.<>?/',
+				'0123456789abcdefghijklmnopqrstuvwxyz');
+		var score = 0, other = {}, seen = {}, lastset = null, mystringlist = mystring
+				.split('');
+		for ( var i = 0; i < mystringlist.length; i++) { // classify this character
+			var c = mystringlist[i], inset = 5;
+			for ( var j = 0; j < csets.length; j++)
+				if (csets[j].indexOf(c) != -1) {
+					inset = j;
+					break;
+				}
+			//calculate effect of character on alphabet size       
+			if (!(inset in seen)) {
+				seen[inset] = 1;
+				score += csets[inset].length;
+			} else if (!(c in other)) {
+				score += 1;
+				other[c] = 1;
+			}
+			if (inset != lastset) {
+				score += 1;
+				lastset = inset;
+			}
+		}
+		var entropy = mystring.length * Math.log(score) / 0.6931471805599453;
+		return Math.round(entropy * 100) / 100
+	}
+
+	function web2py_validate_entropy(myfield, req_entropy) {
+		var validator = function() {
+			var v = (web2py_calc_entropy(myfield.val()) || 0) / req_entropy;
+			var r = 0, g = 0, b = 0, rs = function(x) {
+				return Math.round(x * 15).toString(16)
+			};
+			if (v <= 0.5) {
+				r = 1.0;
+				g = 2.0 * v;
+			} else {
+				r = (1.0 - 2.0 * (Math.max(v, 0) - 0.5));
+				g = 1.0;
+			}
+			var color = '#' + rs(r) + rs(g) + rs(b);
+			myfield.css('background-color', color);
+			entropy_callback = myfield.data('entropy_callback');
+			if (entropy_callback)
+				entropy_callback(v);
+		}
+		if (!myfield.hasClass('entropy_check'))
+			myfield.on('keyup', validator).on('keydown', validator).addClass(
+					'entropy_check');
+	}
+	$(function() {
+		web2py_validate_entropy($('#password1'), 100);
+        $('#birthdate').datepicker({
+                     format: 'yyyy-mm-dd',
+                     viewMode: 2,
+        });
+        
+        $('#location').typeahead({
+                     source: function (query, process) {
+                        return $.get('{{ reverse "location" }}', { query: query }, function (data) {
+                           return process(data.options);
+                        });
+                     }
+        });
+        $('#country').typeahead({
+                     source: function (query, process) {
+                        return $.get('{{ reverse "country" }}', { query: query }, function (data) {
+                           return process(data.options);
+                        });
+                     }
+        });
+	});
+	function setSrcQuery(e, q) {
+		var src  = e.src;
+		var p = src.indexOf('?');
+		if (p >= 0) {
+			src = src.substr(0, p);
+		}
+		e.src = src + "?" + q
+	}
+
+	function reload() {
+		setSrcQuery(document.getElementById('image'), "reload=" + (new Date()).getTime());
+		setSrcQuery(document.getElementById('audio'), (new Date()).getTime());
+		return false;
+	}
+</script>
+
+{{end}}

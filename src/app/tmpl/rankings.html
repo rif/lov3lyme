@@ -1,0 +1,35 @@
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            <th>{{ trans "Photo" .ctx }}</th>
+            <th>{{ trans "Title" .ctx }}</th>            
+            <th>{{ trans "Average vote" .ctx }}</th>
+            <th>{{ trans "Vote count" .ctx }}</th>
+            <th>{{ trans "Ranking score" .ctx }}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{ range .results }}
+        <tr class="apple-tr">
+            <td>
+            	<a href="{{reverse "external_photo" "id" .user.Hex "kind" "p" "photo" ._id.Hex }}" target="_blank"><img class="apple-thumb" src="{{ image ._id.Hex "thumb" }}" alt="ri"/></a>            	
+            </td>
+            <td>{{ .title }}</td>            
+            <td>{{ printf "%.2f" .avg }}</td>
+            <td>{{ .count }}</td>
+            <td>{{ printf "%.2f" .wilson }}</td>
+        </tr>
+    {{ end }}
+    </tbody>
+</table>
+
+
+<script type="text/javascript" charset="utf-8">
+	 $('img.apple-thumb').hover(
+       function(){           
+           $(this).css('z-index','10').stop().animate({marginTop: '-60px', height: '80px', }, 100); 
+       },
+       function() {
+           $(this).stop().animate({marginTop: '0px', height: '20px', }, 200).css('z-index','0');
+      });
+</script>

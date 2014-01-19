@@ -1,0 +1,13 @@
+<p id="heart-rating" href="{{ reverse "vote" "photo" .photoId "csrf_token" .ctx.Session.Values.csrf_token "contest" .contestId }}">
+	<b>{{ trans "Rate it" .ctx }}: </b>
+	{{ .hearts }}</s></s></s></s></s> <span class="muted" id="heart-tip"></span>
+</p>
+<script>
+	$(function() {
+		var tips = ["{{ trans "Common" .ctx }}", "{{ trans "Interesting" .ctx }}", "{{ trans "Attractive" .ctx }}", "{{ trans "Extraordinary" .ctx }}", "{{ trans "My Dream" .ctx }}"];		
+		$("#heart-rating s").mouseover(function(e) {
+			var parents = $(e.target).parents("s");
+			$("#heart-tip").text(tips[parents.length]);
+		});
+	}); 
+</script>

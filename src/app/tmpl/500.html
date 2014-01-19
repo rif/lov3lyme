@@ -1,0 +1,15 @@
+{{define "title"}}lov3ly.me - {{ trans"Intenal error" .ctx }}{{end}}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+    <div class="hero-unit">
+	<h1>500!</h1>
+	<p>{{ trans"Internal server error.</p>
+	<p>{{ trans"The server encountered a temporary error and could not complete your request" .ctx }}.</p>
+    <p>{{ trans"Our engineers have been notified and will try to solve this problem as soon as possible" .ctx }}.<br/>
+      <b>{{ trans"Please check back, soon" .ctx }}!</b></p>
+	</div>
+{{ end }}
+
+{{define "extrascripts"}}{{end}}

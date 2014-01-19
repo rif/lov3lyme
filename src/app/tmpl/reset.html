@@ -1,0 +1,21 @@
+{{ define "title" }}lov3ly.me - Reset password{{ end }}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+    <form class="form-horizontal" action="" method="POST">
+    <legend>{{ trans "Reset Password" .ctx }}</legend>
+  	<div class="control-group {{if .ctx.Data.result.Errors.email }}error{{ end }}">
+		<label class="control-label" for="email">{{ trans "E-mail" .ctx }}</label>
+		<div class="controls">
+			<input type="text" id="email" name="email" placeholder="{{ trans "E-mail" .ctx }}"
+				value="{{ .ctx.Data.result.Values.email }}"> <span
+				class="help-inline">{{ .ctx.Data.result.Errors.email }}</span>
+		</div>
+	</div>
+	<input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+	<button type="submit" class="btn">{{ trans "Request change password link" .ctx }}</button>
+</form>
+{{ end }}
+
+{{define "extrascripts"}}{{end}}

@@ -1,0 +1,132 @@
+{{define "title"}}lov3ly.me{{end}}
+
+{{define "extrahead"}}{{end}}
+
+{{ define "content" }}
+<div class="row">	
+	<div class="offset3 span7" id="filter">
+		<form id="filter-form" class="form-inline" method="POST" action="{{ reverse "filter" }}">
+			<input type="text" class="input-small" id="country" name="country" placeholder="{{ trans "Country" .ctx }}"  autocomplete="off" value="{{ .ctx.Session.Values.filter.Country }}">                            
+			<input type="text" class="input-small" id="location" name="location" placeholder="{{ trans "City" .ctx }}"  autocomplete="off" value="{{ .ctx.Session.Values.filter.Location }}">                            
+			<input type="text" class="input-small" name="age" id="age" placeholder="{{ trans "Age eg: 18-20" .ctx }}" value="{{ .ctx.Session.Values.filter.Age }}">
+			<select name="gender" id="gender" class="small-select">
+				<option value="">{{ trans "Gender" .ctx }}</option>
+				<option value="m" {{if eq .ctx.Session.Values.filter.Gender "m"}}selected="selected"{{end}}>{{ trans "Male" .ctx }}</option>
+				<option value="f" {{if eq .ctx.Session.Values.filter.Gender "f"}}selected="selected"{{end}}>{{ trans "Female" .ctx }}</option>
+			</select>
+			<input type="hidden" name="csrf_token" value="{{ .ctx.Session.Values.csrf_token }}"/>
+			<div class="btn-group">
+				<button type="submit" class="btn filter-clear">
+					&times;
+				</button>
+				<button type="submit" class="btn btn-primary">
+					{{ trans "Filter" .ctx }}
+				</button>
+			</div>
+		</form>
+	</div>
+	<div class="span2" id="ranking-button">
+		<a data-toggle="modal" data-target="#cmo-modal" class="btn btn-large btn-primary" href="{{ reverse "rankings" }}"><i class="icon-white icon-star"></i> {{ trans "Rankings" .ctx }}</a>
+	</div>
+</div>
+<div class="row">
+	<div class="span9">
+		<h4>{{ trans "Photos" .ctx }}</h4>
+		<div class="tabbable">
+			<ul class="nav nav-tabs" id="photos-tabs">
+				<li class="active">
+					<a class="photo-list" data-target="#gal" href="{{ reverse "top" "page" 1 }}" data-toggle="tab">{{ trans "Top Voted" .ctx }}</a>
+				</li>
+				<li>
+					<a class="photo-list" data-target="#gal" href="{{ reverse "latest" "page" 1 }}" data-toggle="tab">{{ trans "Latest" .ctx }}</a>
+				</li>
+				<li>
+					<a class="photo-list" data-target="#gal" href="{{ reverse "random" "page" 1 }}" data-toggle="tab">{{ trans "Random" .ctx }}</a>
+				</li>
+			</ul>
+
+			<div class="tab-content">				
+				<div class="tab-pane active" id="gal"></div>
+			</div>
+		</div><!-- tabbable -->
+	</div>
+	<div class="span3">
+		<h4>{{ trans "Contests" .ctx }}</h4>
+		<div class="tabbable">
+			<ul class="nav nav-tabs" id="contest-tabs">
+				<li class="active">
+					<a class="contest-list" data-target="#contest-area"  href="{{ reverse "contest_list" "list" "adm" }}" data-toggle="tab">{{ trans "Admission" .ctx }}</a>
+				</li>
+				<li>
+					<a class="contest-list" data-target="#contest-area" href="{{ reverse "contest_list" "list" "vot" }}" data-toggle="tab">{{ trans "Voting" .ctx }}</a>
+				</li>
+				<li>
+					<a class="contest-list" data-target="#contest-area" href="{{ reverse "contest_list" "list" "fin" }}" data-toggle="tab">{{ trans "Finished" .ctx }}</a>
+				</li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane active" id="contest-area">
+
+				</div>
+			</div>
+		</div><!-- tabbable -->
+	</div>
+</div><!-- row -->
+{{ end }}
+
+{{define "extrascripts"}}
+<script>
+$(function () {
+	page = 1;
+	photoUrl = "{{reverse "top" "page" 1 }}";
+	$("#gal").load("{{ reverse "empty" }}", function(){		
+		$.get(photoUrl, function(data){			
+			Galleria.get(0).load(data);
+		});	
+	});	
+	$("#contest-area").load("{{ reverse "contest_list" "list" "adm" }}");	
+	$('#location').typeahead({
+		source: function (query, process) {
+		return $.get('{{ reverse "location" }}', { query: query }, function (data) {
+			return process(data.options);
+		});
+	}
+	});
+	$('#country').typeahead({
+		source: function (query, process) {
+		return $.get('{{ reverse "country" }}', { query: query }, function (data) {
+			return process(data.options);
+		});
+	}
+	});
+	$('a.photo-list').on('show', function (e) {
+	var url = $(e.target).attr("href");
+		$.get(url, function(data){
+		if(data.length == 0) {
+			$("p.no-photos").show();
+			var g = Galleria.get(0);
+			g.splice(0, g.getDataLength());
+		} else {
+			$("p.no-photos").hide();
+			Galleria.get(0).load(data);
+			page = 1;
+			photoUrl = url;
+		}
+	});
+	});
+	$('a.contest-list').on('show', function (e) {
+		var url = $(e.target).attr("href");
+		$("#contest-area").load(url);
+	});	
+	$(".filter-clear").click(function(){
+		$("#country").val("");
+		$("#location").val("");
+		$("#age").val("");
+		$("#gender").val(0);
+		return true;
+	});        
+});
+</script>
+<script src="/static/js/share.js?static=%2Fstatic%2Fimg"></script>
+{{end}}

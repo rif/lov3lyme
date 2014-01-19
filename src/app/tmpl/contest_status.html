@@ -1,0 +1,27 @@
+{{ $csrf_token := .ctx.Session.Values.csrf_token }}
+{{ $id := .contest.Id.Hex }}
+<table class="table table-condensed table-hoover">
+	<thead>
+		<tr>
+			<th>{{ trans "User Info" .ctx }}</th>
+			<th>{{ trans "Photo" .ctx }}</th>
+			<th>{{ trans "Photo Info" .ctx }}</th>
+			<th>{{ trans "Approved" .ctx }}</th>
+		</tr>
+	</thead>
+  <tbody>
+  {{ range .contest.Registered }}  	
+  <tr>
+      <td>{{ .UserName }}<br/><span class="muted">{{ .UserInfo }}</span></td>
+      <td><img class="thumb" src="{{ image .Photo.Hex "thumb" }}" alt="thumb" /></td>
+      <td>{{  .Title }}<br/><span class="muted">{{ .Description }}</a></td>
+      <td><input type="checkbox" id="approved" name="approved" disabled="disabled" {{ if .Approved }}checked="yes"{{ end }}></td>
+  </tr>
+  {{ else }}
+  <tr>
+    <td>{{ trans "No user photos yet" .ctx }}.</td>
+  </tr>
+  {{ end }}
+  </tbody>
+</table>
+

@@ -1,0 +1,34 @@
+{{ $csrf_token := .ctx.Session.Values.csrf_token }}
+{{ $id := .contest.Id.Hex }}
+<table class="table table-condensed table-hoover">
+  <tbody>
+  {{ range .contest.ToBeApproved }}
+  <tr>
+      <td>{{ .UserName }}<br/><span class="muted">{{ .UserInfo }}</span></td>
+      <td><img src="{{ image .Photo.Hex "thumb" }}" alt="thumb" /></td>
+      <td>
+        <span class="btn-group">
+          <a class="btn btn-mini btn-danger approve-link" href="{{ reverse "approve_contest" "id" $id "user" .User.Hex "csrf_token" $csrf_token "res" "n"}}"><i class="icon-white icon-remove"></i> Reject</a>
+          <a class="btn btn-mini btn-success approve-link" href="{{ reverse "approve_contest" "id" $id "user" .User.Hex "csrf_token" $csrf_token "res" "y"}}"><i class="icon-white icon-ok"></i> Approve</a>
+        </span>
+      </td>
+  </tr>
+  {{ else }}
+  <tr>
+    <td>Yo have 0 register applications to approve.</td>
+  </tr>
+  {{ end }}
+  </tbody>
+</table>
+
+<script type="text/javascript">
+  $(function(){
+      $(".approve-link").click(function(){
+          var parent_tr = $(this).parents("tr");
+          $.get($(this).attr("href"), function(){
+               parent_tr.fadeOut();
+          });
+      return false;
+      });
+  });
+</script>
